@@ -429,8 +429,8 @@ function updateObjects(){
 	//near +=gegner
 	for(let i=0; i<laser.length; i++){
 		if(objects[laser[i]]){
-		let xtest1 = umgefähr(objects[laser[i]].originalX-X, window.innerWidth/2-100, 100)
-		let ytest1 = umgefähr(objects[laser[i]].originalY-Y, window.innerHeight/2-100, 100)
+		let xtest1 = umgefähr(objects[laser[i]].originalX-X, window.innerWidth/2-100, 70)
+		let ytest1 = umgefähr(objects[laser[i]].originalY-Y, window.innerHeight/2-100, 70)
 		if(objects[laser[i]].time >= 12&&xtest1&&ytest1){
 			objects[laser[i]].time =50
 			playerThings.health-=1
