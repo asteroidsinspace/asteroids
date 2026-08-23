@@ -456,7 +456,7 @@ function updateObjects(){
 		if(objects[laser[i]]){
 		let xtest1 = umgefähr(objects[laser[i]].originalX-X, window.innerWidth/2-100, 70)
 		let ytest1 = umgefähr(objects[laser[i]].originalY-Y, window.innerHeight/2-100, 70)
-		if(objects[laser[i]].time >= 12&&xtest1&&ytest1){
+		if(objects[laser[i]].time >= 12*4.5/objects[laser[i]].speed&&xtest1&&ytest1){
 			objects[laser[i]].time =50
 			playerThings.health-=1
 		}
@@ -483,7 +483,7 @@ function updateObjects(){
 				if(objects[near[j]].gegner&&objects[laser[i]].time >= 12){
 				objects[laser[i]].time = 50
 				objects[near[j]].time += 1
-				if(objects[near[j]].time >= 50){
+				if(objects[near[j]].time >= 50*4.5/objects[laser[i]].speed){
 				let coord = [objects[near[j]].originalX, objects[near[j]].originalY]
 				let obj = createObjectAt(coord[0], coord[1], ships[9+newShips])
 				objects.push(obj)   
