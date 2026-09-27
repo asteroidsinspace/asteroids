@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="utf-8">
-    <title>Zeichnen</title>
+    <title>Game2</title>
     <style>
         html {
 		position: fixed;
@@ -52,7 +52,8 @@
 <script type="module">
     import * as THREE from "https://unpkg.com/three@latest/build/three.webgpu.js";
     const can = document.getElementById("can");
-    let effect = 3 
+    let effect = 5
+    let finalSize = 2
     let destroyedA = []
     const can2 = document.getElementById("can2");
     const ctx1 = can2.getContext("2d")
@@ -103,6 +104,9 @@ let ship1={"metadata":{"version":4.7,"type":"Object","generator":"Object3D.toJSO
     THREE.MeshPhysicalNodeMaterial
 );
 let colliderA = []
+let torus = new THREE.TorusGeometry(100, 60, 16,50)
+let torusM = new THREE.MeshBasicNodeMaterial({color:"#BBBBFF"})
+let tubes = []
 async function real(a) {
     const json = a;
     const loader = new THREE.ObjectLoader();
@@ -160,7 +164,7 @@ let Y = window.innerHeight / 2;
     let speed=4;
     let asteroids = {}
     let fps = 1000;
-    
+    let destroyedDict = {}
     //WICHTIG!
     //const size = 2; // Deine Chunk-Größe
     
@@ -179,14 +183,14 @@ function collidesAt(vector){
     let y = vector.y;
     let z = vector.z;
     for(let i=colliderA.length-1; i>=0; i--){
-        if(ungefaer(x, colliderA[i][0], size2*19)&&ungefaer(y, colliderA[i][1], size2*19)&&ungefaer(z, colliderA[i][2], size2*19)){
+        if(ungefaer(x, colliderA[i][0], size2*19*finalSize)&&ungefaer(y, colliderA[i][1], size2*19*finalSize)&&ungefaer(z, colliderA[i][2], size2*19*finalSize)){
             return colliderA[i]
         }
     }
     return null
 }
 let minScale = new THREE.Vector3(0, 0, 0)
-let maxScale = new THREE.Vector3(19, 19, 19)
+let maxScale = new THREE.Vector3(19*finalSize, 19*finalSize, 19*finalSize)
 function makeInfinite() {
     colliderA = []
     colliderA.length = 0
@@ -235,13 +239,13 @@ function makeInfinite() {
             testVector.z += wrap;
             updated = true;
         }
-        if(testScale.x>=19){
+        if(testScale.x>=19*finalSize){
             colliderA.push([testVector.x, testVector.y, testVector.z])
         }
-        if(testScale.x>=19||testScale.x==0){
+        if(testScale.x>=19*finalSize||testScale.x==0){
             let back = 0;
             for(let i=0; i<destroyedA.length; i++){
-                if(ungefaer(testVector.x, destroyedA[i][0], 0.1)&&ungefaer(testVector.y, destroyedA[i][1], 0.1)&&ungefaer(testVector.z, destroyedA[i][2], 0.1)){
+                if(ungefaer(testVector.x, destroyedA[i][0], 0.1)&&ungefaer(testVector.y, destroyedA[i][1], 0.1)&&ungefaer(testVector.z, destroyedA[i][2], 0.1)&&destroyedDict[destroyedA[i]]>=3){
                     testMatrix.scale(minScale)
                     back=0;
                     updated = 1
@@ -302,7 +306,7 @@ function loadAsteroidAt(x, y, z) {
    if(randX*100<=99.8){
      matrix1.makeScale(1, 1, 1)
    }else{
-    matrix1.makeScale(19, 19, 19)
+    matrix1.makeScale(19*finalSize, 19*finalSize, 19*finalSize)
    }
      
             //matrix1.multiply(matrix2.makeRotationY(0))
@@ -347,9 +351,22 @@ scene.add(testMesh);
     function updateFires(){
         for(let i=fires.length-1; i>=0; i--){
             fires[i].translateZ(-5); 
-            let collliding=collidesAt(fires[i].position)
-            if(collliding){
-                destroyedA.push(collliding)
+            let colliding=collidesAt(fires[i].position)
+            if(colliding){
+                if(destroyedDict[colliding]!=undefined){
+                    destroyedDict[colliding]+=1
+                }else{
+                    destroyedA.push(colliding)
+                    destroyedDict[colliding]=0
+                }
+                if(destroyedDict[colliding]==3){
+                    let mesh1 = new THREE.Mesh(torus, torusM)
+                    mesh1.position.set(colliding[0], colliding[1], colliding[2])
+                    scene.add(mesh1)
+                    tubes.push(mesh1)
+                }
+                
+                
                 fires[i].age = 51
             }
             if(fires[i].age==undefined)fires[i].age=0
@@ -359,6 +376,22 @@ scene.add(testMesh);
                 fires.splice(i,1)
             }
         }
+    }
+    function updateTubes(){
+        for(let i=tubes.length-1; i>=0; i--){
+            tubes[i].scale.x+=1.5
+            tubes[i].scale.y+=1.5
+            shakeMuch()
+            //tubes[i].scale.z+=0.1
+            if(tubes[i].scale.x>=15){
+                scene.remove(tubes[i])
+                tubes.splice(i, 1)
+            }
+        }
+    }
+    function shakeMuch(){
+        can.style.top = -Math.random()*(7*effect)+"px"
+        can.style.left = -Math.random()*(7*effect)+"px"
     }
     function shake(){
         can.style.top = -Math.random()*(3*effect)+"px"
@@ -377,7 +410,8 @@ scene.add(testMesh);
         
         if(e.key ==" "){
             motor=!motor
-            console.log(colliderA)
+            console.log(colliderA.length)
+             console.log(destroyedDict)
         }
         
         if(e.shiftKey||e.key=="m"){
@@ -404,6 +438,7 @@ let shaking = 20;
 function animate(a) {
     requestAnimationFrame(animate);
     updateFires()
+    updateTubes()
     shaking++;
     if(shaking<=20)shake()
     let start1 = performance.now()
