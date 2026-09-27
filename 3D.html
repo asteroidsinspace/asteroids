@@ -443,15 +443,16 @@ function animate(a) {
     if(shaking<=20)shake()
     let start1 = performance.now()
     let elapsed = a - lastTime;
-    testMesh.position.set(player.position.x, player.position.y, player.position.z)
-    counter++
-    counter%=5
-    if(counter==0)makeInfinite();
+    
     if (elapsed >= 16) {
         lastTime = a - (elapsed % 16);
     }else{
         return;
     }
+    testMesh.position.set(player.position.x, player.position.y, player.position.z)
+    counter++
+    counter%=5
+    if(counter==0)makeInfinite();
     const halfWidth = window.innerWidth / 2;
     const halfHeight = window.innerHeight / 2;
 
