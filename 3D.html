@@ -643,3 +643,612 @@ animate();
 </script>
 </body>
 </html>
+        #out{
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            color: whitesmoke;
+        }
+        
+    </style>
+</head>
+<body>
+  
+<canvas id="can" height="650" width="1300" ></canvas><br>
+<output id="out">Hello</output>
+<canvas id="can2" height="1000" width="1000" ></canvas>
+<script type="module">
+    import * as THREE from "https://unpkg.com/three@latest/build/three.webgpu.js";
+    const can = document.getElementById("can");
+    let effect = 5
+    let finalSize = 2
+    let destroyedA = []
+    const can2 = document.getElementById("can2");
+    const ctx1 = can2.getContext("2d")
+    function BasicNoise2D(x, y) {
+    const X = Math.floor(x), Y = Math.floor(y), fx = x - X, fy = y - Y;//Positionen
+    const r = (u, v) => Math.sin(u * 1.7563 + v * 40.243) * 466.12845 %1;//Hash
+    const f = t => t * t * (3 - 2 * t);//schönere kantenr
+    const mix = (a, b, t) => a + f(t) * (b - a);
+    let return1=  mix(mix(r(X, Y), r(X+1, Y), fx), mix(r(X, Y+1), r(X+1, Y+1), fx), fy);//ausgabe
+    
+    return return1+1
+}
+   ctx1.fillStyle = "white"
+    ctx1.fillRect(0, 0, 100, 100)
+    let pixels = 2
+    for(let i=0; i<=1000; i+=pixels){
+        for(let j=0; j<=1000; j+=pixels){
+            let r =Math.abs(Math.abs(BasicNoise2D(i/80, j/80)))*3.5
+            ctx1.fillStyle = "rgb("+(r/4)+", "+0+", "+r+")"
+            ctx1.fillRect(i, j, pixels, pixels)
+        }
+    }
+    const out = document.getElementById("out");
+    let scale = 100
+    let see=20
+    let fires = []
+let ship1={"metadata":{"version":4.7,"type":"Object","generator":"Object3D.toJSON"},"geometries":[{"uuid":"3f969875-fcd6-4c75-8dd0-e6df8a2a5eeb","type":"BufferGeometry","data":{"attributes":{"position":{"itemSize":3,"type":"Float32Array","array":[-1.5,0,-6,1.5,0,-6,1.5,0,4,1.5,0,4,-1.5,0,4,-1.5,0,-6,-1.5,0,-6,1.5,0,-6,0,0,-6,-1.5,0,-6,1.5,0,-6,0,2,-6,1.5,0,4,-1.5,0,4,0,2,4,1.5,0,-6,1.5,0,4,0,2,4,0,2,4,0,2,-6,1.5,0,-6,-1.5,0,-6,-1.5,0,4,0,2,4,0,2,4,0,2,-6,-1.5,0,-6,1.5,0,-2.5,11,0,3.5,1.5,0,3.5,-1.5,0,3.5,-11,0,3.5,-1.5,0,-2.5,11,0,3.5,1.5,0,-2.5,0.5,1,3.5,-1.5,0,-2.5,-11,0,3.5,-0.5,1,3.5,17,-11,18,17,-11,18,17,-11,18],"normalized":false},"uv":{"itemSize":2,"type":"Float32Array","array":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.1850000023841858,0.14000000059604645,0.19075000286102295,0.6700000166893005,0.18199999630451202,0.7200000286102295,0.0022499999031424522,0.07000000029802322,0.08550000190734863,0.8500000238418579,0.15199999511241913,0.03999999910593033,0.1574999988079071,0.3199999928474426,0.1574999988079071,0.3199999928474426,0.1574999988079071,0.3199999928474426,0.15974999964237213,0.47999998927116394,0.15950000286102295,0.47999998927116394,0.15925000607967377,0.49000000953674316,0.1574999988079071,0.3700000047683716,0.1574999988079071,0.36000001430511475,0.1574999988079071,0.36000001430511475,0.15825000405311584,0.38999998569488525,0.15800000727176666,0.3799999952316284,0.15800000727176666,0.3799999952316284,0,0,0,0,0,0,0,0,0,0,0,0,0.16425000131130219,0.25999999046325684,0.16425000131130219,0.25999999046325684,0.164000004529953,0.25999999046325684,0.1652500033378601,0.1599999964237213,0.1652500033378601,0.1599999964237213,0.1652500033378601,0.1599999964237213,0,0,0,0,0,0],"normalized":false},"normal":{"itemSize":3,"type":"Float32Array","array":[0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,-0.800000011920929,-0.6000000238418579,0,-0.800000011920929,-0.6000000238418579,0,-0.800000011920929,-0.6000000238418579,0,-0.800000011920929,-0.6000000238418579,0,-0.800000011920929,-0.6000000238418579,0,-0.800000011920929,-0.6000000238418579,0,-0.800000011920929,0.6000000238418579,0,-0.800000011920929,0.6000000238418579,0,-0.800000011920929,0.6000000238418579,0,-0.800000011920929,0.6000000238418579,0,-0.800000011920929,0.6000000238418579,0,-0.800000011920929,0.6000000238418579,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0.09375858306884766,0.9844651222229004,-0.1484510898590088,0.09375858306884766,0.9844651222229004,-0.1484510898590088,0.09375858306884766,0.9844651222229004,-0.1484510898590088,-0.09375858306884766,0.9844651222229004,-0.1484510898590088,-0.09375858306884766,0.9844651222229004,-0.1484510898590088,-0.09375858306884766,0.9844651222229004,-0.1484510898590088,0,0,0,0,0,0,0,0,0],"normalized":false}},"boundingSphere":{"radius":19.551214796017153,"center":[3,-4.5,6]}}}],"materials":[{"uuid":"3e4f0dbd-45ed-461a-b75c-8e7dcd28aebe","type":"MeshPhysicalNodeMaterial","color":16777215,"roughness":0.4,"metalness":0.9,"sheen":1,"sheenColor":16777215,"sheenRoughness":0.5,"emissive":0,"specularIntensity":1,"specularColor":16777215,"clearcoat":0,"clearcoatRoughness":0,"dispersion":0,"iridescence":0,"iridescenceIOR":1.3,"iridescenceThicknessRange":[100,400],"anisotropy":0,"anisotropyRotation":0,"map":"d17a268c-1ec6-40c2-a54b-d147ce63c374","envMapRotation":[0,0,0,"XYZ"],"envMapIntensity":1,"transmission":0,"thickness":0,"attenuationColor":16777215,"side":2,"blendColor":0,"inputNodes":{}}],"textures":[{"uuid":"d17a268c-1ec6-40c2-a54b-d147ce63c374","name":"","image":"5881b17f-c359-4123-af7e-60305e7286aa","mapping":300,"channel":0,"repeat":[1,1],"offset":[0,0],"center":[0,0],"rotation":0,"wrap":[1001,1001],"format":1023,"internalFormat":null,"type":1009,"normalized":false,"colorSpace":"","minFilter":1008,"magFilter":1006,"anisotropy":1,"flipY":true,"generateMipmaps":true,"premultiplyAlpha":false,"unpackAlignment":4}],"images":[{"uuid":"5881b17f-c359-4123-af7e-60305e7286aa","url":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAD6AAAABkCAYAAACSTs9JAAAQAElEQVR4AezdvXEkVRcG4DuYqiIAEiABEiAAdnxMyaBKthLYAMBW4SCPAKQASIAEqM8mAYxx79dtDLUrVpq/7ul7336oOqXVTPe9533OOhin9qtaSlUNGXw79KJqbcXgh2EeqtZWDB6GeahaWzH4dZiHqrUVgz+GeahaWzH4e5hHWH34X62XVF3Q459aqmrH4M9hHqrUVgx+H+ahSm3F4OMwjxmrOrucZPBjLVW1Y/DdMA9VaisGXw/zUKW2YlDqN8NEVDsO3w/zUKW2YvBTLVW1Y/DzMA9VaisGz8M8VKmtGPw1zEOV2opBHebRbeX1/tcwC1VLKwbPwzxULa0Y/DzMQ9XSisFPwzxULa0YfD/MQ9XSisE3wzxULY0YfF1qVe0YfDfMQ9XaisGPwzxUra0YfBzmoWr9+GWH+vHKn/8+3KdqbcXgz2EeqtZWDP4Z5qFqbcWglr+H/wFR7Tj8McxD1dKKwa/DPFQtrRg8DPNQtbRi8MMwD1VLKwbfDvNQtbRh8FXx34ICriZAgAABAgQItC2w3dUyVttd6o4AAQIECLQuoD8CBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBAIF9AQgIECBAgQIAAAQIECKxHwAL6emYt6WsBvxMgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgcFUBC+hX5XYZAQJ7AT8JECBAYD0Czzeb9YSVlAABAgQIECBA4DMBvxAgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIrE/AAvr6Zi4xAQIECBAgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIEFhGwgL4Iu0sJECBAYL0CkhMgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAgfUKWEBf7+wlJ0CAAAEC6xOQ+KDAdlfLp3XwhXceeL7ZlLHeecRXBAgQIECAAAECBAgQIEBgegEnEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAwKICFtAX5Xc5AQIECBAgQGA9ApISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIEDAArq/AwQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTyBSQk0ISABfQmxqAJAgQIECBAgAABAgRyBSQjQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTyBSTcC1hA30v4SYAAAQIECBAgQIAAAQJ5AhIRIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQJXFVhkAf2qCV1GgAABAgQIECBwlMB2V4967ksPPd9syuv60nM+I0CAAIF1CUhLgAABAgQIECBAgAABAgQI5AtISIAAAQIECBAgQIAAAQIECOQLSEiAAAECBAgQIECAAAEC6xOwgL6+mUtMgAABAgQIEPhXYFw639e/H/oDAQIECBAgkCAgAwECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIEFhGwgL4Iu0vXKyA5AQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAgfUKWEBf7+wlJ7A+AYkJECBAYDaB7a6W1zXbZQ4mQIAAAQIECBAg8J6A7wgQIECAAAECBAgQIECAAIF8AQkJECBAgAABAgQIECBAgACBfAEJCRAgQIAAAQIEFhWwgL4ov8sJECCwHgFJCRAgQIAAAQIECBAgQIAAgXwBCQkQIECAAAECBAgQIECAAIF8AQkJECBAgAABAgQIECBAgACBfAEJCRAgQIAAAQIW0P0dIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgACBJgQsoDcxBk0QIECAAAECuQJtJtvuahmrze50RYAAAQIECBAgQIAAAQIEehPQLwECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQIECCQLyAhAQIECOwFLKDvJfwkQIAAAQIECKxEYFWL5yuZqZgECBAgQIAAAQIECBAgQGDVAsITIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIg0JSABfSmxqEZAgQIECBAgAABAjkCkhAgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhJ4LWAB/bWI3wkQIECAAAECBAgQINC/gAQECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+QJMJLaA3ORZNESBAgAABAgT6Fni+2fQdQPcECBC4SMDLBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQGC9AutZQF/vjCUnQIAAAQIECJTtrv5bc3GMS+f7musO5xIgQIAAgYMCHiBAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAIFFBSygL8q/nsslJUCAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAgAV0fwcI5AtISIAAAQIECBAgQIAAAQIECOQLSEiAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISIAAAQIECBAgQKAJAQvoTYxBEwQI5ApIRoAAgeUFtru6fBM6IECAAAECBAgQIBAtIBwBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAwF7AAvpewk8CBAgQyBOQiACBWQWebzbl05r1MocTIECAAAECBAgQIEDgLQGfEyBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAAAECTQlYQG9qHJohQIAAAQI5ApIQIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAAIHXAhbQX4v4nQABAgQIECDQv4AEBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQIBAvoCEBAgQaFLAAnqTY9EUAQIECBAgQOAyge2uln1ddpK3TxfwBgECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECbwlYQH9LxucECBAgQIAAAQIECPQnoGMCBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBAIF9AQgIECBAgQIAAAQIECBAgQCBfQMKmBSygNz0ezREgQIAAAQIE2hXY7mr5tNrtVGcECFxLwD0ECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+wKGEFtAPCfmeAAECBAgQIBAs8HyzCU4nGgECBFYlICwBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAAECBAgQaELAAvqsY3A4AQIECBAgQKBtge2utt2g7ggQIECAQBcCmiRAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAIG9gAX0vYSfeQISESBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECDQlIAF9KbGoRkCOQKSECBAgEC2wMvDXXldm/vbMlZ2cukIECBAgAABAgQ+FfBnAgQIECBAgAABAgQIECBAIF9AQgIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECrwUsoL8W8TsBAgT6F5CAAIGVCmx3texrSYIWelgyv7sJECBAgAABAgQIXEnANQQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAIEmBSygNzkWTREgQIBAvwI6J0BgLzAuou//7CcBAgQIECBAgAABAgSyBKQhQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgTeErCA/paMzwkQIECAAIH+BHR8FYGXh7ur3OMSAgQIECBAgAABAgQIECDwRQEfEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAQNMCFtCbHo/mCBAgQIAAAQL9COiUAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF5CQAAEChwQsoB8S8j0BAgQIECBAgMDsApv72/Jezd5A/xdIQIAAAQIECBAgQIAAAQIECOQLSEiAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISKALAQvoXYxJkwQIECBAgACB6wm8PNyV92rqTsbF86nPdB6B6wq4jQABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAAAECBAgQyBeQ8FgBC+jHSnmOAAECBAgQINCgwHZXy74abE9LBAgQmF/ADQQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIECAQFMCsyygN5VQMwQIECBAgAABAlcVeHm4K2ONl47L8eNPRYAAAQKZAlIRIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAgdcCFtBfi/T/uwQECBAgQIAAgS4ENve3ZawumtUkAQIECBBoT0BHBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+VZoKXgAAEABJREFUgIQECBAgQIAAAQIECBBoUsACepNj0VS/AjonQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQOAtAQvob8n4nACB/gR0TIAAAQIECBAgQIAAAQIECOQLSEiAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISIAAAQIECBAg0LSABfSmx6M5AgQI9COgUwIEriew3dWyr+vd6iYCBAgQIECAAAECBAiUwoAAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBwSMAC+iEh3xMgQIAAgfYFdEigG4HN/W3Z17FN18enYx/1HAECBAgQIECAAAECBJIFZCNAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECXQhYQO9iTJokQIAAAQIE2hXI6+zDL7+V13VJyv3C+fjzknO8S4AAAQIECBAgQIAAAQIElhNwMwECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQIECCQLyAhAQIECBwrYAH9WCnPESBAgAABAgQItCegIwIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBAIF9AQgIEuhKwgN7VuDRLgAABAgQIrF1gu6tXJ3h5uDvrzvG9sc562UtdCGiSAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF5CQwKkCFtBPFfM8AQIECBAgQIAAAQIElhfQAQECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC/QZUIL6F2OTdMECBAgQIAAAQIECBAgsJyAmwkQIECAAAECBAgQIECAAIF8AQkJECBAgAABAgQIECBAgACBfAEJCRAgQIAAAQIECBAgQIAAgbcEchbQ30rocwIECBAgQIAAgYMCLw935a06+LIHCBAgQIDANQXcRYAAAQIECBAgQIAAAQIECOQLSEiAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAk0LWEBvejz9NKdTAgQIECBAYF6B7a6Wsea9pa3T6+NTGautrnRDgAABAgTWLSA9AQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAAECBAgQIJAvICEBAgQIECBAgAABAgQOCVhAPyTkewLtC+iQAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAQBcCFtC7GJMmCRBoV0BnBAgQIDClQH18Kvua8lxnESBAgAABAgQIELhMwNsECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAscKWEA/VspzBAgQINCegI4IrERgu6srSSomAQIECBAgQIAAAQIEviDgIwIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX0BCAgQIECBAoCsBC+hdjUuzBAgQIECgHQGdECBAgAABAgQIECBAgAABAvkCEhIgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgACBUwUsoJ8q5nkCBAgQIECAwPICsR1s7m/LvmJDCkaAAAECBAgQIECAAAECBI4T8BQBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECBLoUsIDe5dg0TYAAAQIECKxFYLurV4n64ZffylhXuaz7SwQgQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTyBSQkQOBcAQvo58p5jwABAgQIECBAgACB6wu4kQABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAAAECBAgQyBeQsGsBC+hdj0/zBAgQIECAAIHLBF4e7sqnddlp3iZAIF1APgIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBAIF/g0oQW0C8V9D4BAgQIECBAgAABAgQIEJhfwA0ECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAoAsBC+gXjcnLBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIHCsgAX0Y6U8156AjggQIECAAAECBAgQIECAAIF8AQkJECBAgAABAgQIECBAgACBfAEJCRAgQIAAAQIECBAgQIAAgXwBCQkQIECAAAECBAgQ6ErAAnpX49IsgXYEdEKAAAECBOYUqI9Pcx7vbAIECBAgQIAAgSMFPEaAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISIAAAQIECBAgQOBUAQvop4p5ngABAssL6IAAAQLRApbPo8crHAECBAgQIECAwPECniRAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAh0KWABvcuxaZoAAQIElhNwMwECcwpYPp9T19kECBAgQIAAAQIECBwv4EkCBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBAIF9AQgIECBAgQOBcAQvo58p5jwABAgQIELi+wApvfL7ZlH3NEf/DL7/NcawzCRAgQIAAAQIECBAgQIDA+QLeJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTyBSQkQIAAga4FLKB3PT7NEyBAgAABAmsR2O7q4lE1QIAAAQIECBAgQIAAAQIECOQLSEiAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISIAAgUsFLKBfKuh9AgQIECBAgAABAvMLuIEAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJBAhIAF9IgxCkGAAAECBAgQIECAwHwCTiZAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJJxKwAL6VJLOIUCAAAECBAh0IvDycFc+rU7a1iYBAmsVkJsAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEOhK4KwF9K4SapYAAQIECBAg0LHAdlfLWB1H0DoBAgQIdCygdQIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBwqoAF9FPFln9eBwQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIEOhSwAJ6l2PT9HICbiZAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBA4FwBC+jnynmPAIHrC7iRAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECgawEL6F2PT/MECBC4noCbCBAgMLdAfXya+wrnEyBAgAABAgQIECBwQMDXBAgQIECAAAECBAgQIECAQL6AhAQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAgUsFLKBfKuh9AgQIECAwv4AbCBAgQIAAAQIECBAgQIAAgXwBCQkQIECAAAECBAgQIECAAIF8AQkJECBAgAABAgQIECBAgACBfAEJCRAgQIBAhIAF9IgxCkGAAAECBAjMJ5B18svDXZOB6uNTk31pigABAgQIECBAgAABAgTWIiAnAQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAAECBAgQIJAvICEBAgQITCVgAX0qSecQIECAAAECBAhML+BEAgQIECBAgAABAgQIECBAIF9AQgIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX0BCAgSiBCygR41TGAIECBAgQIBAXwLjv3w+Vl9dr6dbSQkQIECAAAECBAgQIECAAIF8AQkJECBAgAABAgQIECBAgACBfAEJCRAgQIAAAQIECBAgQIAAgXwBCQlMLWABfWpR5xEgQIAAAQIEGhV4ebhrqjOL502NQzPtCeiIAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJAAAQIECBAgQIAAAQIECBDIF4hMaAE9cqxCESBAgAABAgQIECBAgMD5At4kQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgAABAgTOFehnAf3chN4jQIAAAQIECHQs8HyzKfs6J8b+3fHnOe97hwABAgQIXF3AhQQIECBAgAABAgQIECBAgEC+gIQECBAgQIAAAQIECBAgQIBAvoCEBAgQIECAAAECBAgQINC1gAX0rsd3vebdRIAAAQIECBCYSqA+PpWxpjrPOQQIECBAgMB0Ak4iQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBAgQIECAAAECBPIFJCRAgAABAgQIECBAgMClAhbQLxX0PoH5BdxAgAABAgROEni+2ZR9nfSihwkQIECAAAECBJYUcDcBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAIEIAQvoEWMUggCB+QScTIAAgXYExqXyQ90c88yhM3xPgAABAgQIECBAYH0CEhMgQIAAAQIECBAgQIAAAQL5AhISIECAAAECBAgQIECAAAEC+QISEiBAgAABAgQITCVgAX0qSecQIECAwPQCTiRAIEqgPj6VsaJCCUOAAAECBAgQIECAwOUCTiBAgAABAgQIECBAgAABAgTyBSQkQIAAAQIECBAgQIAAAQIE8gUkJECAAAECBKIELKBHjVMYAgQIECAwnYCTsgQ297dZgaQhQIAAAQIECBAgQIAAgUkEHEKAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISIAAAQIEphawgD61qPMIECBAgAABApcLOIEAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIGgu1Z8AAAKISURBVECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkJAAAQKRAhbQI8cqFAECBAgQIEDgNIH6+HTaC9FPC0eAAAECBAgQIECAAAECBAjkC0hIgAABAgQIECBAgAABAgQI5AtISIAAAQIECBAgQIAAAQIECOQLSEiAwFwCFtDnknUuAQIECBAgQIDAZwKb+9vPfvcLgS8K+JAAAQIECBAgQIAAAQIECBDIF5CQAAECBAgQIECAAAECBAgQyBeQkAABAgQIECBAgAABAgQIEMgXkDBawAJ69HiFI0CAAAECBNIEnm825b06N6/l8HPlvEcgS0AaAgQIECBAgAABAgQIECBAIF9AQgIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX2DuhBbQ5xZ2PgECBAgQIECAAAECBAgQOCzgCQIECBAgQIAAAQIECBAgQCBfQEICBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECAQIWAB/d0x+pIAAQIECBAgQGBKgc397ZTHOYsAAQIECEwk4BgCBAgQIECAAAECBAgQIEAgX0BCAgQIECBAgAABAgQIECBAIF9AQgIECBAgQIAAAQIECBCYSsAC+lSSzplewIkECBAgQIBApIAl9MixCkWAAAECBM4X8CYBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAAECUQIW0KPGKQyB6QScRIAAAQJZAvXxqbxVSyS1hL6EujsJECBAgAABAv8V8AkBAgQIECBAgAABAgQIECCQLyAhAQIECBAgQIAAAQIECBAgkC8gIQECBAgQIECAAIGpBf4PAAD//wnhcLAAAAAGSURBVAMAE9IRr29z7ygAAAAASUVORK5CYII="}],"object":{"uuid":"093a3ae5-b4eb-437d-93ee-8d9f02aeb106","type":"Mesh","layers":1,"matrix":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],"up":[0,1,0],"geometry":"3f969875-fcd6-4c75-8dd0-e6df8a2a5eeb","material":"3e4f0dbd-45ed-461a-b75c-8e7dcd28aebe"}}    
+    can.height = window.innerHeight+(3*effect);
+    can.width = window.innerWidth+(3*effect);
+    
+    // THREE Variablen
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(60, can.width / can.height, 0.1, 3000000);
+    let renderer = new THREE.WebGPURenderer({canvas: can, antialias: true});
+    const gridHelper = new THREE.GridHelper(100000, 1000);
+    let asteroid = new THREE.Mesh(new THREE.IcosahedronGeometry(220/scale, 0), new THREE.MeshPhongNodeMaterial({color:"#EFEFEF", flatShading: true, specular: 0xFFFFFF,shininess: 2, map: new THREE.CanvasTexture(can2)}))
+    asteroid.material.color.setRGB(0, 40, 20)
+    let instancedMesh =  new THREE.InstancedMesh(asteroid.geometry, asteroid.material,(see*2)**3 );
+   instancedMesh.matrixAutoUpdate = false;
+    instancedMesh.updateMatrix();
+    scene.add(instancedMesh)
+    gridHelper.position.y = -5
+    //scene.add(gridHelper)
+    let movement = new THREE.Vector3()
+    
+    let motor = true
+    THREE.MaterialLoader.registerMaterial(
+    'MeshPhysicalNodeMaterial', 
+    THREE.MeshPhysicalNodeMaterial
+);
+let ships = []
+let colliderA = []
+let torus = new THREE.TorusGeometry(100, 60, 16,50)
+let torusM = new THREE.MeshBasicNodeMaterial({color:"#BBBBFF"})
+let tubes = []
+async function real(a) {
+    const json = a;
+    const loader = new THREE.ObjectLoader();
+
+    try {
+       
+        const mesh3 = await loader.parseAsync(json);
+          
+        mesh3.traverse(function(child) {
+            if (child.isMesh && child.material) {
+                if (child.material.map) {
+                    child.material.map.needsUpdate = true;
+                }
+                child.material.needsUpdate = true;
+            }
+        });
+
+       
+        return mesh3;
+       
+    } catch (error) {
+        console.error(" Fehler");
+    }
+}
+
+let big1 = 1
+ship1 = await real(ship1);
+
+ship1.geometry.scale(2.3, 2.3, 2.3);
+let player = ship1.clone()
+scene.add(player)
+
+
+    let light4 = new THREE.DirectionalLight("white", 1.5);
+    
+
+    light4.position.set(30, 40, 20); 
+    scene.add(light4);
+    
+    let drag = false;
+    let X = window.innerWidth / 2;
+let Y = window.innerHeight / 2;
+    
+    let collider = []
+    
+    await renderer.init();
+   let size = 7000/scale;
+  // scene.fog = new THREE.Fog("#010101", see*size-size*5, see*size)
+   let size2 = 300/scale;
+    camera.rotation.order = "YXZ";
+    //player.rotation.order = "YXZ";
+   player.add(camera);
+   
+    camera.position.y =16*big1;
+     camera.position.z =40*big1;
+      player.position.set(0, 0, 0)
+
+    let speed=4;
+    let asteroids = {}
+    let fps = 1000;
+    let destroyedDict = {}
+    //WICHTIG!
+    //const size = 2; // Deine Chunk-Größe
+    function newShip(x, y, z){
+        let ship3 = ship1.clone()
+        ship3.position.set(x, y, z)
+        ship3.rotation.set(Math.random()*(Math.PI*2), Math.random()*(Math.PI*2), Math.random()*(Math.PI*2))
+        ship3.age=0;
+        ships.push(ship3)
+        scene.add(ship3)
+    }
+    function createShips(){
+        let verteilung = size*5
+        for(let i=0; i<30; i++){
+            newShip(Math.random()*verteilung-verteilung/2, Math.random()*verteilung-verteilung/2, Math.random()*verteilung-verteilung/2)
+
+        }
+    }
+    createShips()
+
+function pseudoRandom3D(x, y, z) {
+    let dot = x * 49.30584 + y * 60.4045 + z * 55.4725;
+    let val = Math.sin(dot) * 54973.593674;
+    return (val - Math.floor(val));
+}
+let testMatrix = new THREE.Matrix4()
+let testVector = new THREE.Vector3()
+let testScale  = new THREE.Vector3()
+
+function collidesAt(vector){
+    let x = vector.x;
+    let y = vector.y;
+    let z = vector.z;
+    for(let i=colliderA.length-1; i>=0; i--){
+        if(ungefaer(x, colliderA[i][0], size2*19*finalSize)&&ungefaer(y, colliderA[i][1], size2*19*finalSize)&&ungefaer(z, colliderA[i][2], size2*19*finalSize)){
+            return colliderA[i]
+        }
+    }
+    return null
+}
+let minScale = new THREE.Vector3(0, 0, 0)
+let maxScale = new THREE.Vector3(19*finalSize, 19*finalSize, 19*finalSize)
+function makeInfinite() {
+    colliderA = []
+    colliderA.length = 0
+    let worldCam = new THREE.Vector3();
+    camera.getWorldPosition(worldCam);
+
+    const wrap = (see * 2 + 1) * size;
+    const halfWrap = wrap / 2;
+
+    for (let i = 0; i < (see * 2 + 1) ** 3; i++) {
+
+        instancedMesh.getMatrixAt(i, testMatrix);
+        testVector.setFromMatrixPosition(testMatrix);
+        testScale.setFromMatrixScale(testMatrix);
+        
+
+        let dx = testVector.x - worldCam.x;
+        let dy = testVector.y - worldCam.y;
+        let dz = testVector.z - worldCam.z;
+
+        let updated = false;
+
+        if (dx > halfWrap) {
+            testVector.x -= wrap;
+            updated = true;
+        }
+        else if (dx < -halfWrap) {
+            testVector.x += wrap;
+            updated = true;
+        }
+
+        if (dy > halfWrap) {
+            testVector.y -= wrap;
+            updated = true;
+        }
+        else if (dy < -halfWrap) {
+            testVector.y += wrap;
+            updated = true;
+        }
+
+        if (dz > halfWrap) {
+            testVector.z -= wrap;
+            updated = true;
+        }
+        else if (dz < -halfWrap) {
+            testVector.z += wrap;
+            updated = true;
+        }
+        if(testScale.x>=19*finalSize){
+            colliderA.push([testVector.x, testVector.y, testVector.z])
+        }
+        if(testScale.x>=19*finalSize||testScale.x==0){
+            let back = 0;
+            for(let i=0; i<destroyedA.length; i++){
+                if(ungefaer(testVector.x, destroyedA[i][0], 0.1)&&ungefaer(testVector.y, destroyedA[i][1], 0.1)&&ungefaer(testVector.z, destroyedA[i][2], 0.1)&&destroyedDict[destroyedA[i]]>=3){
+                    testMatrix.scale(minScale)
+                    back=0;
+                    updated = 1
+                    break
+                }else{
+                    back=1
+                }
+
+            }
+            if(back&&testScale.x==0){
+                testMatrix.scale(maxScale)
+                colliderA.push([testVector.x, testVector.y, testVector.z])
+                updated=1
+            }
+        }
+        if (updated) {
+            testMatrix.setPosition(
+                testVector.x,
+                testVector.y,
+                testVector.z
+            );
+
+            instancedMesh.setMatrixAt(i, testMatrix);
+        }
+    }
+
+    instancedMesh.instanceMatrix.needsUpdate = true;
+}
+
+
+
+
+function ungefaer(a, b, c){
+    return Math.abs(a-b)<c
+}
+function loadAsteroidAt(x, y, z) {
+    //let object1 = asteroid.clone();
+    
+    
+    let randX = pseudoRandom3D(x, y, z);
+    let randY = pseudoRandom3D(y, z, x);
+    let randZ = pseudoRandom3D(z, x, y);
+    
+   
+    let offsetRange = size * 0.85; 
+    
+    let offsetX = (randX - 0.5) * offsetRange;
+    let offsetY = (randY - 0.5) * offsetRange;
+    let offsetZ = (randZ - 0.5) * offsetRange;
+    
+    
+    
+    
+    // Rotation für den organischen Look
+    
+    
+   // scene.add(object1);
+   if(randX*100<=99.8){
+     matrix1.makeScale(1, 1, 1)
+   }else{
+    matrix1.makeScale(19*finalSize, 19*finalSize, 19*finalSize)
+   }
+     
+            //matrix1.multiply(matrix2.makeRotationY(0))
+            matrix1.setPosition(Math.round(x + offsetX), Math.round(y + offsetY), Math.round(z + offsetZ))//pseudoRandom3D(x*size, y*size, z*size)
+            //console.log(matrix1)
+            instancedMesh.setMatrixAt(i, matrix1);
+            //worldI.setColorAt(i, mesh.material.color);
+            i++
+   // asteroids[x + "," + y + "," + z] = object1;
+}
+
+    
+    let i=0;
+    let matrix1 = new THREE.Matrix4()
+    let matrix2 = new THREE.Matrix4()
+    for(let x=-see;x<=see;x++){
+        for(let z=-see;z<=see;z++){
+            for(let y=-see;y<=see;y++){
+               loadAsteroidAt(x*size, y*size, z*size)
+            }
+        }
+    }
+   
+        //worldI.count = meshes.count;
+        instancedMesh.frustumCulled = false;
+         
+        instancedMesh.instanceMatrix.needsUpdate = true;//worldI.updateMatrix();
+        //instancedMesh.instanceColor.needsUpdate = true;
+   scene.fog = new THREE.Fog("#010101", see*size-size*5, see*size-size)
+let texture = new THREE.CanvasTexture(can2)
+const testMesh = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(size*see, 2), 
+    new THREE.MeshBasicNodeMaterial({  color: "white" , side: THREE.DoubleSide, map: texture, fog: false}) 
+);
+//testMesh.position.set(1409, -2686, -5049)
+scene.add(testMesh); 
+
+    //Wichtig!
+    
+    let fireG = new THREE.BoxGeometry(0.3, 0.3, 10)
+    let fireM = new THREE.MeshLambertNodeMaterial({color:"yellow",emissive: 0x00ff88,  emissiveIntensity: 2.0})
+    function updateShips(){
+        for(let i=ships.length-1; i>=0; i--){
+            for(let j=fires.length-1; j>=0; j--){
+                let xtest = ungefaer(ships[i].position.x, fires[j].position.x, 20)
+                let ytest = ungefaer(ships[i].position.y, fires[j].position.y,10)
+                let ztest = ungefaer(ships[i].position.z, fires[j].position.z, 20)
+                if(xtest&&ytest&&ztest&&ships[i].age>=5){
+                    fires[j].age = 50
+                    let mesh1 = new THREE.Mesh(torus, torusM)
+                    mesh1.position.set(ships[i].position.x, ships[i].position.y, ships[i].position.z)
+                    scene.add(mesh1)
+                    tubes.push(mesh1)
+                    scene.remove(ships[i])
+                    ships.splice(i, 1)
+                    
+                     
+                    continue;
+
+                }else if(xtest&&ytest&&ztest){
+                    ships[i].age++
+                    fires[j].age = 50
+                }
+            }
+            ships[i].translateZ(-1); 
+            if(ungefaer(player.position.x, ships[i].position.x, see*size)&&ungefaer(player.position.y, ships[i].position.y, see*size)&&ungefaer(player.position.z, ships[i].position.z, see*size)){
+
+            }else{
+                
+                let rand = Math.round(Math.random()*5+1)
+                if (rand == 1) {
+    ships[i].position.set(
+        player.position.x + see * size / 2,
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else if (rand == 2) {
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+        player.position.y + see * size / 2,
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else if(rand==3){
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        player.position.z + see * size / 2
+    );
+}else if (rand == 4) {
+    ships[i].position.set(
+       -( player.position.x + see * size / 2),
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else if (rand == 5) {
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+       -( player.position.y + see * size / 2),
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else {
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        -(player.position.z + see * size / 2)
+    );
+}
+            }
+        }
+    }
+    function updateFires(){
+        for(let i=fires.length-1; i>=0; i--){
+            fires[i].translateZ(-5); 
+            let colliding=collidesAt(fires[i].position)
+            if(colliding){
+                if(destroyedDict[colliding]!=undefined){
+                    destroyedDict[colliding]+=1
+                }else{
+                    destroyedA.push(colliding)
+                    destroyedDict[colliding]=0
+                }
+                if(destroyedDict[colliding]==3){
+                    let mesh1 = new THREE.Mesh(torus, torusM)
+                    mesh1.position.set(colliding[0], colliding[1], colliding[2])
+                    scene.add(mesh1)
+                    tubes.push(mesh1)
+                }
+                
+                
+                fires[i].age = 51
+            }
+            if(fires[i].age==undefined)fires[i].age=0
+            fires[i].age+=0.4
+            if(fires[i].age>=50){
+                scene.remove(fires[i])
+                fires.splice(i,1)
+            }
+        }
+        
+    }
+    function updateTubes(){
+        for(let i=tubes.length-1; i>=0; i--){
+            tubes[i].scale.x+=1.5
+            tubes[i].scale.y+=1.5
+            shakeMuch()
+            //tubes[i].scale.z+=0.1
+            if(tubes[i].scale.x>=15){
+                scene.remove(tubes[i])
+                tubes.splice(i, 1)
+            }
+        }
+    }
+    function shakeMuch(){
+        can.style.top = -Math.random()*(7*effect)+"px"
+        can.style.left = -Math.random()*(7*effect)+"px"
+    }
+    function shake(){
+        can.style.top = -Math.random()*(3*effect)+"px"
+        can.style.left = -Math.random()*(3*effect)+"px"
+    }
+    out.addEventListener("pointerdown", function(e){
+        let newX = parseInt(prompt("Where X?", 0))
+        let newY = parseInt(prompt("Where Y?", 0))
+        let newZ = parseInt(prompt("Where Z?", 0))
+        player.position.set(newX, newY, newZ)
+    });
+    document.addEventListener("keydown", function (e) {
+        
+        
+        
+        
+        if(e.key ==" "){
+            motor=!motor
+            console.log(colliderA.length)
+             console.log(destroyedDict)
+        }
+        
+        if(e.shiftKey||e.key=="m"){
+            shaking=0
+           let obj = new THREE.Mesh(fireG, fireM)
+            obj.position.copy(player.position)  
+            obj.maker = "self"
+
+      
+            obj.rotation.copy(player.rotation) 
+
+            fires.push(obj)
+            scene.add(obj)
+        }
+        
+        renderer.render(scene, camera);
+    });
+    const weiter = new THREE.Vector3(0, 0, -1);
+const pitch = new THREE.Vector3(1, 0, 0);
+const roll = new THREE.Vector3(0, 0, 1);
+let lastTime = 0;
+let counter =0;
+let shaking = 20;
+function animate(a) {
+    requestAnimationFrame(animate);
+    updateFires()
+    updateTubes()
+    shaking++;
+    if(shaking<=20)shake()
+    let start1 = performance.now()
+    let elapsed = a - lastTime;
+    
+    if (elapsed >= 16) {
+        lastTime = a - (elapsed % 16);
+    }else{
+        return;
+    }
+    updateShips()
+    testMesh.position.set(player.position.x, player.position.y, player.position.z)
+    counter++
+    counter%=5
+    if(counter==0)makeInfinite();
+    const halfWidth = window.innerWidth / 2;
+    const halfHeight = window.innerHeight / 2;
+
+    const relX = (X - halfWidth) / halfWidth;
+    const relY = (Y - halfHeight) / halfHeight;
+    //if(Math.round(camera.position.x)%size==0||Math.round(camera.position.y)%size==0||Math.round(camera.position.z)%size==0)makeInfinite()
+    if (motor) {
+        player.rotateOnAxis(
+            pitch,
+            relY * 0.04
+        );
+
+        
+        player.rotateOnAxis(
+            roll,
+            -relX * 0.04
+        );
+    }
+
+    
+    weiter.set(0, 0, -1);
+    
+    weiter.applyQuaternion(player.quaternion);
+
+    
+    if (motor) {
+        movement.addScaledVector(weiter, 4 / scale);
+    }
+
+    
+    if (shaking > 0 && shaking <= 5) {
+    
+        movement.addScaledVector(weiter, -(4 / scale) * 2);
+    }
+
+    
+    movement.multiplyScalar(0.98);
+    player.position.add(movement);
+    
+    renderer.render(scene, camera);
+    let end = performance.now()
+    fps = 1000/(end-start1)
+    out.innerHTML = "FPS:"+Math.round(fps)+"<br>X: "+Math.round(player.position.x)+" Y: "+Math.round(player.position.y)+" Z: "+Math.round(player.position.z)
+}
+
+animate();
+    //animate()
+    document.addEventListener("pointermove", function (e) {
+        X = e.clientX;
+        Y = e.clientY;
+        /*let width = window.innerWidth/2
+        let height = window.innerHeight/2
+        if(Y>=height){
+            
+        }*/
+        if(!motor&&drag){
+            camera.rotation.y -= e.movementX*0.002;
+            camera.rotation.x -= e.movementY*0.002;
+            
+        }
+        
+    });
+
+    document.addEventListener("pointerdown", function (e) {
+        drag=true
+        if(true){
+            shaking=0
+           let obj = new THREE.Mesh(fireG, fireM)
+            obj.position.copy(player.position)  
+            obj.maker = "self"
+
+      
+            obj.rotation.copy(player.rotation) 
+
+            fires.push(obj)
+            scene.add(obj)
+        }
+
+        
+           
+    });
+
+   
+        
+      
+
+
+    document.addEventListener("pointerup", function (e) {
+        drag = false;
+    });
+
+    
+</script>
+</body>
+</html>
