@@ -89,7 +89,8 @@ let ship1={"metadata":{"version":4.7,"type":"Object","generator":"Object3D.toJSO
     let camera = new THREE.PerspectiveCamera(60, can.width / can.height, 0.1, 3000000);
     let renderer = new THREE.WebGPURenderer({canvas: can, antialias: true});
     const gridHelper = new THREE.GridHelper(100000, 1000);
-    let asteroid = new THREE.Mesh(new THREE.IcosahedronGeometry(220/scale, 0), new THREE.MeshPhongNodeMaterial({color:"#DDDDDD", flatShading: true, specular: 0xFFFFFF,shininess: 90}))
+    let asteroid = new THREE.Mesh(new THREE.IcosahedronGeometry(220/scale, 0), new THREE.MeshPhongNodeMaterial({color:"#EFEFEF", flatShading: true, specular: 0xFFFFFF,shininess: 2, map: new THREE.CanvasTexture(can2)}))
+    asteroid.material.color.setRGB(0, 40, 20)
     let instancedMesh =  new THREE.InstancedMesh(asteroid.geometry, asteroid.material,(see*2)**3 );
    instancedMesh.matrixAutoUpdate = false;
     instancedMesh.updateMatrix();
@@ -103,6 +104,7 @@ let ship1={"metadata":{"version":4.7,"type":"Object","generator":"Object3D.toJSO
     'MeshPhysicalNodeMaterial', 
     THREE.MeshPhysicalNodeMaterial
 );
+let ships = []
 let colliderA = []
 let torus = new THREE.TorusGeometry(100, 60, 16,50)
 let torusM = new THREE.MeshBasicNodeMaterial({color:"#BBBBFF"})
@@ -132,8 +134,10 @@ async function real(a) {
     }
 }
 
-
+let big1 = 1
 ship1 = await real(ship1);
+
+ship1.geometry.scale(2.3, 2.3, 2.3);
 let player = ship1.clone()
 scene.add(player)
 
@@ -157,9 +161,10 @@ let Y = window.innerHeight / 2;
     camera.rotation.order = "YXZ";
     //player.rotation.order = "YXZ";
    player.add(camera);
-    camera.position.y =16;
-     camera.position.z =40;
-      player.position.set(2409, -3686, -6049)
+   
+    camera.position.y =16*big1;
+     camera.position.z =40*big1;
+      player.position.set(0, 0, 0)
 
     let speed=4;
     let asteroids = {}
@@ -167,7 +172,22 @@ let Y = window.innerHeight / 2;
     let destroyedDict = {}
     //WICHTIG!
     //const size = 2; // Deine Chunk-Größe
-    
+    function newShip(x, y, z){
+        let ship3 = ship1.clone()
+        ship3.position.set(x, y, z)
+        ship3.rotation.set(Math.random()*(Math.PI*2), Math.random()*(Math.PI*2), Math.random()*(Math.PI*2))
+        ship3.age=0;
+        ships.push(ship3)
+        scene.add(ship3)
+    }
+    function createShips(){
+        let verteilung = size*5
+        for(let i=0; i<30; i++){
+            newShip(Math.random()*verteilung-verteilung/2, Math.random()*verteilung-verteilung/2, Math.random()*verteilung-verteilung/2)
+
+        }
+    }
+    createShips()
 
 function pseudoRandom3D(x, y, z) {
     let dot = x * 49.30584 + y * 60.4045 + z * 55.4725;
@@ -348,6 +368,79 @@ scene.add(testMesh);
     
     let fireG = new THREE.BoxGeometry(0.3, 0.3, 10)
     let fireM = new THREE.MeshLambertNodeMaterial({color:"yellow",emissive: 0x00ff88,  emissiveIntensity: 2.0})
+    function updateShips(){
+        for(let i=ships.length-1; i>=0; i--){
+            for(let j=fires.length-1; j>=0; j--){
+                let xtest = ungefaer(ships[i].position.x, fires[j].position.x, 20)
+                let ytest = ungefaer(ships[i].position.y, fires[j].position.y,10)
+                let ztest = ungefaer(ships[i].position.z, fires[j].position.z, 20)
+                if(xtest&&ytest&&ztest&&ships[i].age>=5){
+                    fires[j].age = 50
+                    let mesh1 = new THREE.Mesh(torus, torusM)
+                    mesh1.position.set(ships[i].position.x, ships[i].position.y, ships[i].position.z)
+                    scene.add(mesh1)
+                    tubes.push(mesh1)
+                    scene.remove(ships[i])
+                    ships.splice(i, 1)
+                    
+                     
+                    continue;
+
+                }else if(xtest&&ytest&&ztest){
+                    ships[i].age++
+                    fires[j].age = 50
+                }
+            }
+            ships[i].translateZ(-1); 
+            if(ungefaer(player.position.x, ships[i].position.x, see*size)&&ungefaer(player.position.y, ships[i].position.y, see*size)&&ungefaer(player.position.z, ships[i].position.z, see*size)){
+
+            }else{
+                
+                let rand = Math.round(Math.random()*5+1)
+                if (rand == 1) {
+    ships[i].position.set(
+        player.position.x + see * size / 2,
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else if (rand == 2) {
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+        player.position.y + see * size / 2,
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else if(rand==3){
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        player.position.z + see * size / 2
+    );
+}else if (rand == 4) {
+    ships[i].position.set(
+       -( player.position.x + see * size / 2),
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else if (rand == 5) {
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+       -( player.position.y + see * size / 2),
+        player.position.z + Math.random() * see * size - (see * size) / 2
+    );
+
+} else {
+    ships[i].position.set(
+        player.position.x + Math.random() * see * size - (see * size) / 2,
+        player.position.y + Math.random() * see * size - (see * size) / 2,
+        -(player.position.z + see * size / 2)
+    );
+}
+            }
+        }
+    }
     function updateFires(){
         for(let i=fires.length-1; i>=0; i--){
             fires[i].translateZ(-5); 
@@ -376,6 +469,7 @@ scene.add(testMesh);
                 fires.splice(i,1)
             }
         }
+        
     }
     function updateTubes(){
         for(let i=tubes.length-1; i>=0; i--){
@@ -449,6 +543,7 @@ function animate(a) {
     }else{
         return;
     }
+    updateShips()
     testMesh.position.set(player.position.x, player.position.y, player.position.z)
     counter++
     counter%=5
