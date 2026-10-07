@@ -732,7 +732,7 @@
         function animate(a) {
             if(playerThings.health<=0){
                 playerThings.health = playerThings.maxHealth
-                respawn = 60
+                respawn = 10
             }
             if(respawn)playerThings.health = playerThings.maxHealth
             requestAnimationFrame(animate);
@@ -833,6 +833,7 @@
             drag = true
             initShootAudio();
             if (respawn==0) {
+                motor = 1
                 shaking = 0
                 let obj = new THREE.Mesh(fireG, fireM)
                 obj.position.copy(player.position)
