@@ -50,6 +50,7 @@
             left: 10px;
             z-index: 1000;
             color: whitesmoke;
+            text-shadow: 0px 0px 20px rgb(255, 255, 255);
         }
 
         #shop {
@@ -58,6 +59,19 @@
             left: 300px;
             z-index: 1001;
             color: rgb(255, 255, 97);
+            text-shadow: 0px 0px 20px rgb(255, 255, 97);
+        }
+
+        #shop2 {
+            box-shadow: 0 0 30px #77AAFF;
+        }
+
+        #shop {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            
         }
     </style>
 </head>
@@ -92,12 +106,15 @@
             if (!shopping) {
                 shopping = true
                 txt.innerHTML = ""
-                txt.innerHTML += "<b data-ship='0'>ArrowShip</b><p>Costs: 0</p><br>"
-                txt.innerHTML += "<b data-ship='1'>DoubleShip</b><p>Costs: 120</p><br>"
-                txt.innerHTML += "<b data-ship='2'>EggShip</b><p>Costs: 240</p><br>"
-                txt.innerHTML += "<b data-ship='3'>TenkShip</b><p>Costs: 360</p><br>"
-                txt.innerHTML += "<b data-ship='4'>ButterflyShip</b><p>Costs: 480</p><br>"
+                let mal = 4
+                txt.innerHTML += "<b data-ship='0'>ArrowShip</b><p>Costs: "+(0**2*8*mal)+"</p><br>"
+                txt.innerHTML += "<b data-ship='1'>DoubleShip</b><p>Costs: "+(1**2*8*mal)+"</p><br>"
+                txt.innerHTML += "<b data-ship='2'>EggShip</b><p>Costs: "+(2**2*8*mal)+"</p><br>"
+                txt.innerHTML += "<b data-ship='3'>TenkShip</b><p>Costs: "+(3**2*8*mal)+"</p><br>"
+                txt.innerHTML += "<b data-ship='4'>ButterflyShip</b><p>Costs: "+(4**2*8*mal)+"</p><br>"
+                shop.style.width = "25vw"
             } else {
+                shop.style.width = "0vw"
                 shopping = false
                 txt.innerHTML = ""
             }
@@ -108,7 +125,8 @@
             if (!b) return;
             const shipType = b.dataset.ship;
             if (b.dataset.ship != undefined) {
-                let neededPoints = parseInt(b.dataset.ship) * 120
+                let mal = 4
+                let neededPoints = parseInt(b.dataset.ship)**2*8*mal
                 if (points < neededPoints) return;
                 points -= neededPoints
                 let position = [player.position.x, player.position.y, player.position.z]
@@ -218,8 +236,8 @@
 
 
 
-                x += Math.random() * 0.1-0.05;
-                y += Math.random() * 0.1-0.05;
+                x += Math.random() * 0.1 - 0.05;
+                y += Math.random() * 0.1 - 0.05;
                 z += Math.random() * 0.1;
                 if (x >= 2 || z >= 2 || y >= 2) {
                     x = 0
@@ -959,7 +977,7 @@
             if (playerThings.health < playerThings.maxHealth) {
                 playerThings.health += playerThings.healthReload / 16
             }
-           // player.scale.set(2.3+movement.x/10, 2.3+movement.y/10, 2.3+movement.z/10)
+            // player.scale.set(2.3+movement.x/10, 2.3+movement.y/10, 2.3+movement.z/10)
             testMesh.position.set(player.position.x, player.position.y, player.position.z)
             counter++
             counter %= 5
@@ -1007,8 +1025,11 @@
             renderer.render(scene, camera);
             let end = performance.now()
             fps = 1000 / (end - start1)
-            if (respawn > 0) respawn -= 1 / 16
-            out.innerHTML = "FPS:" + Math.round(fps) + "<br>X: " + Math.round(player.position.x) + " Y: " + Math.round(player.position.y) + " Z: " + Math.round(player.position.z) + "<br>Health: " + "<progress value=" + playerThings.health + " max=" + playerThings.maxHealth + "></progress><br><b>POINTS: </b>" + points
+            if (respawn > 0) {
+                respawn -= 1 / 16
+                if(respawn<=1 / 16)player.position.set(Math.random()*1000, Math.random()*1000, Math.random()*1000)
+            }
+            out.innerHTML = "FPS:" + Math.round(fps) + "<br>X: " + Math.round(player.position.x) + " Y: " + Math.round(player.position.y) + " Z: " + Math.round(player.position.z) + "<br><p style='color:yellow;'>HEALTH: " + "<progress value=" + playerThings.health + " max=" + playerThings.maxHealth + "></progress></p><br><p style='color:red;'><b>POINTS: </b>" + points+"</p>"
             if (respawn) out.innerHTML += "<br><h1 style='font-size: 20vw;'>Respawn " + Math.round(respawn) + "</h1>";
         }
 
