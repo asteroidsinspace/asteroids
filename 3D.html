@@ -166,6 +166,7 @@
         );
         const ctx1 = can2.getContext("2d")
         function activateShop() {
+            if (document.readyState !== 'complete' || !ready || player === undefined) return;
             if (!shopping) {
                 shopping = true
                 txt.innerHTML = ""
