@@ -136,6 +136,7 @@
         const startscreen = document.getElementById("startscreen");
         const startbtn = document.getElementById("startbtn");
         startbtn.addEventListener("click", function (e) {
+            startbtn.innerHTML = "Lädt..."
             if (document.readyState !== 'complete' || !ready || player === undefined) return;
             started = 1
             startscreen.style.top = "-10000px"
@@ -1068,6 +1069,7 @@
             }
         }
         function animate(a) {
+            if (!(document.readyState !== 'complete' || !ready || player === undefined)) startbtn.innerHTML="START";
             ready = 1
             requestAnimationFrame(animate);
             if (!started) return;
